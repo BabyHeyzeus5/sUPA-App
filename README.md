@@ -76,5 +76,5 @@ open index.html   # or just double-click index.html
 
 ## Screenshots / Demo
 On the landing page 
-![Landing Page](assets/demo_img/)
+![Landing Page](assets/demo_img/landingPage.png)
 ## License
