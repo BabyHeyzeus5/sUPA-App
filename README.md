@@ -33,7 +33,7 @@ The **sUAS Performance Analysis App (sUPA App)** is a webapp made by **Andrew Je
     ├── requirements.json <-- Main file to edit
     └── README.md
 ```
-## Contributions
+## How to Contribute
 If you would like to contribute to sUPA the best way is to update requirements.json to keep up-to-date with each semester's requirements following these steps.
 - Fork this repo.  
 - Create a feature branch for your changes.  
