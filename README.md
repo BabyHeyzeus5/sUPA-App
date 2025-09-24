@@ -22,16 +22,16 @@ The **sUAS Performance Analysis App (sUPA App)** is a webapp made by **Andrew Je
 
 ## Project Structure
 ```text
-sUPA-App/
-├── index.html
-├── results.html
-├── css/
-│ └── style.css
-├── javaScripts/
-│ ├── resultScript.js
-│ └── script.js
-├── requirements.json <-- Main file to edit
-└── README.md
+    sUPA-App/
+    ├── index.html
+    ├── results.html
+    ├── css/
+    │ └── style.css
+    ├── javaScripts/
+    │ ├── resultScript.js
+    │ └── script.js
+    ├── requirements.json <-- Main file to edit
+    └── README.md
 
 ## Contributions
 If you would like to contribute to sUPA the best way is to update requirements.json to keep up-to-date with each semester's requirements following these steps.
