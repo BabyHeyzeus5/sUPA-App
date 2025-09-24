@@ -75,20 +75,66 @@ cd sUPA-App
 open index.html   # or just double-click index.html
 
 ## Screenshots / Demo
+
+### Landing Page
 ![Landing Page](assets/demo_images/landingPage.png)
-On the landing page, follow these steps:
-1. Use the drop down to select the correct year for requirements
-![Drop Down Menue](assets/demo_images/dropdown.png)
-1. Use informations from the CFD spreadsheet to fill out the star CCM section
-![Where to find Windspan](assets/demo_images/wingspanData.png)
-![Where to find cl cd](assets/demo_images/CLCD_data.png)
-![Filled out form](assets/demo_images/StarData.png)
-1. Fill out weight with estimated dry weight and payload weight.
+
+---
+
+### 1. Select Requirements Year
+Use the dropdown to select the correct year for requirements.  
+![Drop Down Menu](assets/demo_images/dropdown.png)
+
+---
+
+### 2. Enter CFD Data
+Fill in the **Star CCM** section using information from the CFD spreadsheet.  
+
+- Wingspan data:  
+  ![Where to find Wingspan](assets/demo_images/wingspanData.png)
+
+- CL / CD data:  
+  ![Where to find CL CD](assets/demo_images/CLCD_data.png)
+
+- Completed form:  
+  ![Filled out form](assets/demo_images/StarData.png)
+
+---
+
+### 3. Enter Weight Data
+Input estimated **dry weight** and **payload weight**.  
 ![Filled out weight](assets/demo_images/weightData.png)
-1. If not running with **Propulsion Data** hit Run Analysis and look at results. Otherwise continue to the next step. (**note: only the stall speed requirement is used when there is no proplusion data**)
-1. If running with propulsion data, click the checkmark and provided the number of motors to be used. A folder of motorcalc data files should be prepared before hand and upload the folder using the **Choose File** button. (**note: reccomended range for motocalc is 100%-35% throttle in 5% steps**)
+
+---
+
+### 4. Without Propulsion Data
+- If you are **not** using propulsion data:  
+  - Click **Run Analysis**  
+  - Review results  
+
+*Note: Only the stall speed requirement is checked without propulsion data.*
+
+---
+
+### 5. With Propulsion Data
+- Check the **Propulsion Data** box  
+- Enter the number of motors  
+- Prepare a folder of **MotoCalc** data files beforehand  
+- Upload using **Choose File**  
+
+*NOTE: Recommended MotoCalc range: 100% → 35% throttle in 5% steps*  
+
 ![Filled out propulsion](assets/demo_images/propData.png)
-1. Click Run Analysis and review results. If you want to view a different altitude, use the drop down.
+
+---
+
+### 6. Run Analysis & Review Results
+- Click **Run Analysis**  
+- View results on the results page  
+
 ![Results Page](assets/demo_images/results%20page.png)
+
+To view performance at different altitudes, use the **altitude dropdown**:  
 ![Dropdown Altitude](assets/demo_images/altitudeSelect.png)
+
 ## License
