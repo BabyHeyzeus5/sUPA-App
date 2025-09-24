@@ -63,3 +63,18 @@ If you would like to contribute to sUPA the best way is to update requirements.j
             "Objective": 50
         }
     }
+```
+## Running the Webapp
+To use **sUPA** you can go to the website [here](https://babyheyzeus5.github.io/sUPA-App/).
+Alternatively you can run locally:
+# Clone the repo
+git clone https://github.com/username/sUPA-App.git
+
+# Open in a browser
+cd sUPA-App
+open index.html   # or just double-click index.html
+
+## Screenshots / Demo
+On the landing page 
+![Landing Page](assets/demo_img/)
+## License
