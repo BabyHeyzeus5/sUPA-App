@@ -32,6 +32,7 @@ The **sUAS Performance Analysis App (sUPA App)** is a webapp made by **Andrew Je
     │ └── script.js
     ├── requirements.json <-- Main file to edit
     └── README.md
+    └── LICENSE.md
 ```
 ## How to Contribute
 If you would like to contribute to sUPA the best way is to update requirements.json to keep up-to-date with each semester's requirements following these steps.
@@ -138,3 +139,6 @@ To view performance at different altitudes, use the **altitude dropdown**:
 ![Dropdown Altitude](assets/demo_images/altitudeSelect.png)
 
 ## License
+
+This project is licensed under the MIT License, [See License](/LICENSE.md)
+ file for details.
