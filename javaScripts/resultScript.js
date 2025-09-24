@@ -1,6 +1,46 @@
+// Global Variables
 var motorToggle = localStorage.getItem("motorToggle");
 let weight;
 
+// Function to pull json data
+async function  populateRequirements(requirementSet) {
+    try {
+        const response = await fetch("requirements.json");
+        if (!response.ok) {
+            throw new Error("Failed to fetch requirements.json");
+        }
+
+        const data= await response.json();
+
+        const yearReqs = data[requirementSet];
+        if (!yearReqs) {
+            console.warn('No requirements found for ${requirementSet}');
+            return;
+        }
+
+        const requirements = Object.values(yearReqs).map(values => [values.Threshold, values.Objective]);
+
+        return requirements;
+
+
+    } catch (error) {
+        console.error("Error loading requirements:", error);
+    }
+}
+
+// Functions to remove classes from the requirement bugs
+function removeClasses(req) {
+    if (req.classList.contains("notMet")) {
+        req.classList.remove("notMet");
+    } else if (req.classList.contains("threshold")) {
+        req.classList.remove("threshold");
+    } else if (req.classList.contains("objective")) {
+        req.classList.remove("objective");
+    }
+
+}
+
+// Table Download Code
 document.getElementById("downloadTable").addEventListener("click", function () {
     const table = document.querySelector("#resultsTable");
     let csvContent = "data:text/csv;charset=utf-8,";
@@ -33,26 +73,9 @@ document.getElementById("downloadTable").addEventListener("click", function () {
     document.body.removeChild(link);
 });
 
-
-const requirements = [
-    [30, 45], // Flight time, minutes
-    [6000, 9000], // Max Cruise Altitude (asl)
-    [25, 20], // Stall speed
-    [45, 50] // Max Speed
-]
-
-function removeClasses(req) {
-    if (req.classList.contains("notMet")) {
-        req.classList.remove("notMet");
-    } else if (req.classList.contains("threshold")) {
-        req.classList.remove("threshold");
-    } else if (req.classList.contains("objective")) {
-        req.classList.remove("objective");
-    }
-
-}
-
+// Main Code to load data
 document.addEventListener("DOMContentLoaded", function () {
+    // Set HTML elements to be variables
     const toggleButton = document.getElementById("toggleButton");
     const resultsTable = document.getElementById("resultsTable");
     const altitudeSelect = document.getElementById("altitudeSelect");
@@ -62,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const req4 = document.getElementById("requirement4");
     let chartInstance1 = null;
     let chartInstance2 = null;
+    // Log for debug
     console.log(motorToggle);
 
     toggleButton.addEventListener("click", function () {
@@ -73,9 +97,9 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleButton.textContent = "Show Table";
         }
     });
-
+    
     function loadResults() {
-        
+        // Load the rest
         let maxEndurance;
         let maxEnduranceVelocity;
         let maxEnduranceAltitude;
@@ -111,85 +135,94 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         console.log(results);
 
+                // Load Requirement Set
+        let requirementSet = JSON.parse(localStorage.getItem("requirementSet"));
+        document.getElementById("requirementSelected").innerHTML = `Requirement Year Selected: ${requirementSet}`
+        console.log(requirementSet);
+        populateRequirements(requirementSet).then(requirements => {
+            console.log(requirements);
+            // update requirements as needed
+            if (motorToggle == "true") {
+                // requirement 1
+                if (requirements[0][1] < maxEndurance ) {
+                    req1.classList.add("objective");
+                    req1.innerHTML += "Objective";
+                } else if (requirements[0][0] < maxEndurance ) {
+                    req1.classList.add("threshold");
+                    req1.innerHTML += "Threshold";
+                } else {
+                    req1.classList.add("notMet");
+                    req1.innerHTML += "Not Met";
+                }
+                //requirement 2
+                if (requirements[1][1] <= maxAltitude ) {
+                    req2.classList.add("objective");
+                    req2.innerHTML += "Objective";
+                } else if (requirements[1][0] < maxAltitude ) {
+                    req2.classList.add("threshold");
+                    req2.innerHTML += "Threshold";
+                } else {
+                    req2.classList.add("notMet");
+                    req2.innerHTML += "Not Met";
+                }
+
+                //requirement 4
+                if (requirements[3][1] < maxCalcVelocity) {
+                    req4.classList.add("objective");
+                    req4.innerHTML += "Objective"
+                } else if (requirements[3][0] < maxCalcVelocity) {
+                    req4.classList.add("threshold");
+                    req4.innerHTML += "Threshold";
+                } else {
+                    req4.classList.add("notMet");
+                    req4.innerHTML += "Not Met";
+                }
+                
+                // calculate minimum battery capacity needed for objectives
+                function calcBatt(time, current) {
+                    return (time / 60) * current * 1000;
+                }
+                batteryThreshold = calcBatt(30, maxEnduranceAmps);
+                batteryObjective = calcBatt(45, maxEnduranceAmps);
+
+
+                document.getElementById("resultLog").innerHTML = `
+                Max endurance is ${maxEndurance.toFixed(0)} minutes traveling at ${maxEnduranceVelocity} mph at ${maxEnduranceAltitude.toFixed(0)} ft (msl) pulling ${maxEnduranceAmps.toFixed(2)} amps.<br>
+                Battery capacity required for: Threshold: ${batteryThreshold.toFixed(0)}mAh, Objective: ${batteryObjective.toFixed(0)}mAh.<br>
+                Max speed is ${maxCalcVelocity} mph at ${maxCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
+                Min stall speed is ${minCalcVelocity} mph at ${minCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
+                Maximum calculated altitude is ${maxAltitude} ft (msl).`;
+
+            } else {
+                req1.innerHTML += ("Not Available");
+                req2.innerHTML += ("Not Available");
+                req4.innerHTML += ("Not Available");
+                
+                document.getElementById("resultLog").innerHTML = `
+                Max endurance is unavailable.<br>
+                Max speed is unavailable.<br>
+                Min stall speed is ${minCalcVelocity} mph.<br>
+                Maximum calculated altitude is unavailable.`;
+            }
+
+            //requirement 3
+            if (requirements[2][1] > minCalcVelocity) {
+                req3.classList.add("objective");
+                req3.innerHTML += "Objective";
+            } else if (requirements[2][0] > minCalcVelocity) {
+                req3.classList.add("threshold");
+                req3.innerHTML += "Threshold";
+            } else {
+                req3.classList.add("notMet");
+                req3.innerHTML += "Not Met";
+            }
         
-        // update requirements as needed
-        if (motorToggle == "true") {
-            // requirement 1
-            if (requirements[0][1] < maxEndurance ) {
-                req1.classList.add("objective");
-                req1.innerHTML += "Objective";
-            } else if (requirements[0][0] < maxEndurance ) {
-                req1.classList.add("threshold");
-                req1.innerHTML += "Threshold";
-            } else {
-                req1.classList.add("notMet");
-                req1.innerHTML += "Not Met";
-            }
-            //requirement 2
-            if (requirements[1][1] <= maxAltitude ) {
-                req2.classList.add("objective");
-                req2.innerHTML += "Objective";
-            } else if (requirements[1][0] < maxAltitude ) {
-                req2.classList.add("threshold");
-                req2.innerHTML += "Threshold";
-            } else {
-                req2.classList.add("notMet");
-                req2.innerHTML += "Not Met";
-            }
+        });
 
-            //requirement 4
-            if (requirements[3][1] < maxCalcVelocity) {
-                req4.classList.add("objective");
-                req4.innerHTML += "Objective"
-            } else if (requirements[3][0] < maxCalcVelocity) {
-                req4.classList.add("threshold");
-                req4.innerHTML += "Threshold";
-            } else {
-                req4.classList.add("notMet");
-                req4.innerHTML += "Not Met";
-            }
-            
-            // calculate minimum battery capacity needed for objectives
-            function calcBatt(time, current) {
-                return (time / 60) * current * 1000;
-            }
-            batteryThreshold = calcBatt(30, maxEnduranceAmps);
-            batteryObjective = calcBatt(45, maxEnduranceAmps);
-
-
-            document.getElementById("resultLog").innerHTML = `
-            Max endurance is ${maxEndurance.toFixed(0)} minutes traveling at ${maxEnduranceVelocity} mph at ${maxEnduranceAltitude.toFixed(0)} ft (msl) pulling ${maxEnduranceAmps.toFixed(2)} amps.<br>
-            Battery capacity required for: Threshold: ${batteryThreshold.toFixed(0)}mAh, Objective: ${batteryObjective.toFixed(0)}mAh.<br>
-            Max speed is ${maxCalcVelocity} mph at ${maxCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
-            Min stall speed is ${minCalcVelocity} mph at ${minCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
-            Maximum calculated altitude is ${maxAltitude} ft (msl).`;
-
-        } else {
-            req1.innerHTML += ("Not Available");
-            req2.innerHTML += ("Not Available");
-            req4.innerHTML += ("Not Available");
-            
-            document.getElementById("resultLog").innerHTML = `
-            Max endurance is unavailable.<br>
-            Max speed is unavailable.<br>
-            Min stall speed is ${minCalcVelocity} mph.<br>
-            Maximum calculated altitude is unavailable.`;
-        }
-
-        //requirement 3
-        if (requirements[2][1] > minCalcVelocity) {
-            req3.classList.add("objective");
-            req3.innerHTML += "Objective";
-        } else if (requirements[2][0] > minCalcVelocity) {
-            req3.classList.add("threshold");
-            req3.innerHTML += "Threshold";
-        } else {
-            req3.classList.add("notMet");
-            req3.innerHTML += "Not Met";
-        }
-    
         altitudeSelect.innerHTML = ""; // Clear previous options
 
+
+        // COPY THIS IF NEEDED FOR THE JSON
         for (let altitude in results) {
             let option = document.createElement("option");
             option.value = altitude;
@@ -203,7 +236,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function updateTable() {
+
+    // Updates Table when a new altitude is chosen
+    function updateTable() {    
         let results;
         if (motorToggle == "true"){
             results = JSON.parse(localStorage.getItem("analysisResults"));
@@ -252,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function drawChart() {
         let results;
-        
+        // Checks if user has used thrust values
         if (motorToggle == "true") {
             results = JSON.parse(localStorage.getItem("analysisResults")) || {};
         } else {
@@ -297,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 chartInstance2 = null;
             }
     
-    
+            // Chart 1 L/D vs airspeed
             chartInstance1 = new Chart(ctx1, {
                 type: "line",
                 data: {
@@ -340,8 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
     
-            const idealSpeeds = [50, 80]; // Example ideal speeds in mph
-    
+            // Chart 2 Thrust Required vs Airspeed
             chartInstance2 = new Chart(ctx2, {
                 type: "line",
                 data: {
@@ -402,27 +436,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         }   
     
                     }
-                },
-                plugins: {
-                    annotation: {
-                        annotations: idealSpeeds.map(speed => ({
-                            type: "line",
-                            mode: "vertical",
-                            scaleID: "x",
-                            value: speed,
-                            borderColor: "black",
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            label: {
-                                content: `Ideal Speed: ${speed} mph`,
-                                enabled: true,
-                                position: "top"
-                            }
-                        }))
-                    }
                 }
             });
         } else {
+            // No motor data in this section
             for (let velocity in results[selectedAltitude]) {
                 // Skip first 10 vel
                 if (velocity < 16) continue;
@@ -444,7 +461,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 chartInstance2 = null;
             }
     
-    
+            // L/D vs Airspeed
             chartInstance1 = new Chart(ctx1, {
                 type: "line",
                 data: {
@@ -487,8 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
     
-            const idealSpeeds = [50, 80]; // Example ideal speeds in mph
-    
+            // Required Thrust vs Airspeed
             chartInstance2 = new Chart(ctx2, {
                 type: "line",
                 data: {
@@ -519,24 +535,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
                         }
     
-                    }
-                },
-                plugins: {
-                    annotation: {
-                        annotations: idealSpeeds.map(speed => ({
-                            type: "line",
-                            mode: "vertical",
-                            scaleID: "x",
-                            value: speed,
-                            borderColor: "black",
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            label: {
-                                content: `Ideal Speed: ${speed} mph`,
-                                enabled: true,
-                                position: "top"
-                            }
-                        }))
                     }
                 }
             });

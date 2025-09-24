@@ -1,0 +1,38 @@
+{
+    "Spring 2025": {
+        "endurance": {
+            "Threshold": 30,
+            "Objective": 45
+        },
+        "Cruise Altitude": {
+            "Threshold": 6000,
+            "Objective": 9000
+        },
+        "Stall Speed": {
+            "Threshold": 25,
+            "Objective": 20
+        },
+        "Max Speed": {
+            "Threshold": 45,
+            "Objective": 50
+        }
+    },
+    "Fall 2025": {
+        "endurance": {
+            "Threshold": 20,
+            "Objective": 40
+        },
+        "Cruise Altitude": {
+            "Threshold": 4000,
+            "Objective": 5000
+        },
+        "Stall Speed": {
+            "Threshold": 25,
+            "Objective": 20
+        },
+        "Max Speed": {
+            "Threshold": 45,
+            "Objective": 50
+        }
+    }
+}

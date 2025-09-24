@@ -63,6 +63,12 @@ const airDensities = [
 function pullFormData() {
     try {
         // Gather form inputs
+
+        // Selected Requirements
+        const selectedRequirements = document.getElementById("requirementYear").value;
+        console.log(selectedRequirements);
+
+        // Lift and Drag Data
         const S = parseFloat(document.getElementById("planformArea").value);
         const lSlopeConstants = [
             parseFloat(document.getElementById("lSlope").value),
@@ -80,13 +86,12 @@ function pullFormData() {
 
         // get motor data
         const motorToggle = document.getElementById("uploadToggle").checked;
-        let batteryEnergy = NaN;
         let motorNum = 0;
         if (motorToggle) {
             motorNum = parseInt(document.getElementById("motoNum").value);
         }
 
-        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum];
+        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements];
 
     } catch (error) {
         console.error("Error in pullFormData:", error);
@@ -273,7 +278,7 @@ function runAnalysis(event) {
         console.error("Form data could not be retrieved.");
         return; // Stop execution if form data is invalid
     }
-    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum] = formData;
+    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements] = formData;
     const totalWeight = dryWeight + payloadWeight
 
     if (motorToggle) {
@@ -418,7 +423,7 @@ function runAnalysis(event) {
                         dynamicPressure: dynamicPressure.toFixed(2),
                         coefficientLift: coefficientLift.toFixed(2),
                         coefficientDrag: coefficientDrag.toFixed(2),
-                        AoA: AoA.toFixed(0),
+                        AoA: AoA.toFixed(1),
                         dragOz: dragOz.toFixed(2),
                         lOverD: lOverD.toFixed(2),
                         cLThreeHalfD: cLThreeHalfD.toFixed(2),
@@ -482,6 +487,7 @@ function runAnalysis(event) {
             localStorage.setItem("maxResults", JSON.stringify(maxVals));
             localStorage.setItem("motorToggle", true);
             localStorage.setItem("altResults", JSON.stringify(altResults));
+            localStorage.setItem("requirementSet", JSON.stringify(selectedRequirements));
 
             console.log("Successfully uploaded results");
             window.location.href = "results.html";
@@ -530,7 +536,7 @@ function runAnalysis(event) {
                     dynamicPressure: dynamicPressure.toFixed(2),
                     coefficientLift: coefficientLift.toFixed(2),
                     coefficientDrag: coefficientDrag.toFixed(2),
-                    AoA: AoA.toFixed(0),
+                    AoA: AoA.toFixed(1),
                     dragOz: dragOz.toFixed(2),
                     lOverD: lOverD.toFixed(2),
                     cLThreeHalfD: cLThreeHalfD.toFixed(2),
@@ -553,7 +559,7 @@ function runAnalysis(event) {
         localStorage.setItem("analysisResultsNoThrust", JSON.stringify(results));
         localStorage.setItem("maxResults", JSON.stringify(maxVals));
         localStorage.setItem("motorToggle", false);
-
+        localStorage.setItem("requirementSet", JSON.stringify(selectedRequirements));
         console.log("Successfully uploaded results");
         window.location.href = "results.html";
     }
@@ -561,8 +567,34 @@ function runAnalysis(event) {
 
 document.getElementById("inputForm").addEventListener("submit", runAnalysis);
 
+async function  populateRequirementYears() {
+    try {
+        const response = await fetch("requirements.json");
+        if (!response.ok) {
+            throw new Error("Failed to fetch requirements.json");
+        }
+
+        const data = await response.json();
+
+        // Extract top layer
+        const years = Object.keys(data);
+
+        const select = document.getElementById("requirementYear");
+        select.innerHTML = "";
+
+        years.forEach(year => {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error loading requirement years:", error);
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
+    populateRequirementYears();
     const form = document.getElementById("inputForm");
 
     form.addEventListener("keydown", function (event) {
@@ -582,3 +614,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
