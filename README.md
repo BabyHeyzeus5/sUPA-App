@@ -75,6 +75,20 @@ cd sUPA-App
 open index.html   # or just double-click index.html
 
 ## Screenshots / Demo
-On the landing page 
 ![Landing Page](assets/demo_images/landingPage.png)
+On the landing page, follow these steps:
+1. Use the drop down to select the correct year for requirements
+![Drop Down Menue](assets/demo_images/dropdown.png)
+1. Use informations from the CFD spreadsheet to fill out the star CCM section
+![Where to find Windspan](assets/demo_images/wingspanData.png)
+![Where to find cl cd](assets/demo_images/CLCD_data.png)
+![Filled out form](assets/demo_images/StarData.png)
+1. Fill out weight with estimated dry weight and payload weight.
+![Filled out weight](assets/demo_images/weightData.png)
+1. If not running with **Propulsion Data** hit Run Analysis and look at results. Otherwise continue to the next step. (**note: only the stall speed requirement is used when there is no proplusion data**)
+1. If running with propulsion data, click the checkmark and provided the number of motors to be used. A folder of motorcalc data files should be prepared before hand and upload the folder using the **Choose File** button. (**note: reccomended range for motocalc is 100%-35% throttle in 5% steps**)
+![Filled out propulsion](assets/demo_images/propData.png)
+1. Click Run Analysis and review results. If you want to view a different altitude, use the drop down.
+![Results Page](assets/demo_images/results%20page.png)
+![Dropdown Altitude](assets/demo_images/altitudeSelect.png)
 ## License
