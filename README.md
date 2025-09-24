@@ -14,11 +14,51 @@ The **sUAS Performance Analysis App (sUPA App)** is a webapp made by **Andrew Je
 
 ---
 
-## 💡 About
-- What this webapp does.  
-- Who it’s for.  
-- Tech stack (HTML/CSS/JS, etc.).
-
+## About
+- Runs analysis on CFD and MotoCalc datasets.  
+- Compares actual sUAS performance with course-defined requirements.  
+- Built as a lightweight webapp (HTML, CSS, JavaScript, JSON).
 ---
 
-## 🗂 Project Structure
+## Project Structure
+sUPA-App/
+├── index.html
+├── results.html
+├── css/
+│ └── style.css
+├── javaScripts/
+│ ├── resultScript.js
+│ └── script.js
+├── requirements.json <-- Main file to edit
+└── README.md
+
+## Contributions
+If you would like to contribute to sUPA the best way is to update requirements.json to keep up-to-date with each semester's requirements following these steps.
+- Fork this repo.  
+- Create a feature branch for your changes.  
+- Update **requirements.json** with new or modified requirements.  
+- Submit a Pull Request for review. 
+
+## JSON File Guidelines
+**requirements.json** is set up to be a simple and effective way for requirements to be added. Currently, sUPA checks performance for endurance (in minutes), cruise altitude (in ft-msl), maximum cruise speed (in mph), and minimum cruise speed (in mph) for both threshold and objective requirements. Below is the layout of the json file.
+
+**Example format:**
+```json
+    "Spring 2025": {
+        "endurance": {
+            "Threshold": 30,
+            "Objective": 45
+        },
+        "Cruise Altitude": {
+            "Threshold": 6000,
+            "Objective": 9000
+        },
+        "Stall Speed": {
+            "Threshold": 25,
+            "Objective": 20
+        },
+        "Max Speed": {
+            "Threshold": 45,
+            "Objective": 50
+        }
+    }
