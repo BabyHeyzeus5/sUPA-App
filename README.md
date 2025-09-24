@@ -21,6 +21,7 @@ The **sUAS Performance Analysis App (sUPA App)** is a webapp made by **Andrew Je
 ---
 
 ## Project Structure
+```text
 sUPA-App/
 ├── index.html
 ├── results.html
