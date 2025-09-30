@@ -1,13 +1,15 @@
+html {
+    min-height: 100%;
+}
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(to bottom, #003366, #66ccff);
     color: white;
     text-align: center;
-    padding: 20px;
     height: 100%;
     display: block;
     align-items: center;
-    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -27,6 +29,7 @@ a {
     border-radius: 8px;
     text-align: left; /* Ensures text remains left-aligned */
     margin: auto;
+    margin-bottom: 20px;
 }
 
 input[type=text] {
@@ -133,4 +136,5 @@ footer {
     font-size: 1.5rem;
     text-decoration: none;
     border-radius: 15px;
+    margin-top: 10px;
 }
