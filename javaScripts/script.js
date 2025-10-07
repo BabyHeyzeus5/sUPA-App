@@ -1,6 +1,6 @@
 /* Constants */
 const batteryEnergy = 67.2; // Whr
-
+// densitite in slug/ft^3
 const airDensities = [
     0.0023769, // 0 ft
     0.0023423, // 500 ft
@@ -87,17 +87,27 @@ function pullFormData() {
         // get motor data
         const motorToggle = document.getElementById("uploadToggle").checked;
         let motorNum = 0;
+        let dataType;
         if (motorToggle) {
             motorNum = parseInt(document.getElementById("motoNum").value);
+            const selectedDataType = document.querySelector('input[name="dataSelector"]:checked');
+            dataType = selectedDataType.value;
+
         }
 
-        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements];
+        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements, dataType];
 
     } catch (error) {
         console.error("Error in pullFormData:", error);
         window.alert("Error in analysis:" + error.message);
         return null;
     }
+}
+
+function convertTunnelData(motorNum) {
+    
+    // convert form data into correct units
+    
 }
 
 
@@ -156,7 +166,7 @@ function pullMotorData(motoNum) {
                         let [airspeed, thrust, efficiency, propEfficiency, rpm, current] = [
                             parseFloat(columns[0]), parseFloat(columns[12 + shift]),
                             parseFloat(columns[16 + shift]), parseFloat(columns[15 + shift]),
-                            parseInt(columns[11 + shift]), parseFloat(columns[3 + shift])
+                            parseInt(columns[11 + shift]), parseFloat(columns[4 + shift])
                         ];
 
                         if (!lookupTable[airspeed]) lookupTable[airspeed] = {};
@@ -278,10 +288,10 @@ function runAnalysis(event) {
         console.error("Form data could not be retrieved.");
         return; // Stop execution if form data is invalid
     }
-    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements] = formData;
+    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements, dataType] = formData;
     const totalWeight = dryWeight + payloadWeight
 
-    if (motorToggle) {
+    if (motorToggle && dataType == 'motoCalc') {
         pullMotorData(motorNum).then(({lookupTable, batteryEnergy, batteryCells}) => {
 
             // Create object to save information calculated
@@ -435,21 +445,6 @@ function runAnalysis(event) {
 
                     
                 }
-                // Calculate takeoff parameters for given altitude
-                // const velocityLiftOff = 1.2 * minCalcVelocity;
-                // const incidenceAngle = 3; // degrees
-                // const coefficientLiftTo = lSlopeConstants[0] * (incidenceAngle) + lSlopeConstants[1];
-                // const coefficientDragTo = dSlopeConstants[0] * incidenceAngle**4 + dSlopeConstants[1] * incidenceAngle**3 + dSlopeConstants[2] * incidenceAngle**2 + dSlopeConstants[3] * incidenceAngle + dSlopeConstants[4];
-
-                // const qTo = 0.5 * rho * (0.7 * velocityLiftOff)**2;
-                // const liftTo = qTo * S * coefficientLiftTo;
-                // const dragTO = qTo * S * coefficientDragTo; 
-
-                // const friction = 0.08 // wet grass
-                // let thrustTo;
-
-                // const groundRoll = (1.44 * totalWeight**2) / (32.2 * rho * coefficientLiftTo * (thrustTO - dragTO - friction * (totalWeight - liftTo)));
-
                 // create an object for max values at each altitude
                 altResults[altitude] = {
                     maxROC: maxRateOfClimb.toFixed(0),
@@ -492,6 +487,27 @@ function runAnalysis(event) {
             console.log("Successfully uploaded results");
             window.location.href = "results.html";
         });
+    } else if (motorToggle && dataType == 'windTunnel'){
+        //SECTION FOR WIND TUNNEL INFORMATION
+        console.log("Running Wind Tunnel Analysis...");
+
+        //TODO
+        // Take in data
+        // convert power into amps
+        // Convert thrust into ct
+        // convert to equations
+        // go through all altitudes and airspeeds until thrust required > thrust available
+
+        results[altitude][airspeed] = {
+            dynamicPressure: dynamicPressure.toFixed(2),
+            coefficientLift: coefficientLift.toFixed(2),
+            coefficientDrag: coefficientDrag.toFixed(2),
+            AoA: AoA.toFixed(1),
+            dragOz: dragOz.toFixed(2),
+            lOverD: lOverD.toFixed(2),
+            cLThreeHalfD: cLThreeHalfD.toFixed(2),
+        }
+
     } else {
         const airspeedValues = [...Array(66).keys()]; // Airspeed from 0-65 mph
         // Create object to save information calculated
