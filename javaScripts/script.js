@@ -166,7 +166,7 @@ function pullMotorData(motoNum) {
                         let [airspeed, thrust, efficiency, propEfficiency, rpm, current] = [
                             parseFloat(columns[0]), parseFloat(columns[12 + shift]),
                             parseFloat(columns[16 + shift]), parseFloat(columns[15 + shift]),
-                            parseInt(columns[11 + shift]), parseFloat(columns[4 + shift])
+                            parseInt(columns[11 + shift]), parseFloat(columns[3 + shift])
                         ];
 
                         if (!lookupTable[airspeed]) lookupTable[airspeed] = {};
