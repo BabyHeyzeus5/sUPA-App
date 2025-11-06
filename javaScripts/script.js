@@ -356,11 +356,19 @@ function runAnalysis(event) {
                     if (lowerThrottle === null) lowerThrottle = throttleKeys[0]; // Lowest available throttle
                     if (upperThrottle === null) upperThrottle = throttleKeys[throttleKeys.length - 1]; // Highest available throttle
 
+                    // Other edge case where upper and lower are 100
+
                     // Interpolate Data to get exact throttle setting and efficiency
                     throttleSetting = interpolate(dragOz / motorNum, lookupTable[airspeed][lowerThrottle].thrust, lookupTable[airspeed][upperThrottle].thrust, lowerThrottle, upperThrottle);
                     efficiencySetting = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].efficiency, lookupTable[airspeed][upperThrottle].efficiency);
-                    currentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].current, lookupTable[airspeed][upperThrottle].current);
+                    if (upperThrottle == lowerThrottle) {
+                        currentNeeded = lookupTable[airspeed][lowerThrottle].current;
+                    }else {
+                        currentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].current, lookupTable[airspeed][upperThrottle].current);
+                    }
                     currentNeeded = currentNeeded * motorNum;
+                    console.log(`Speed: ${velocity} | Thrust Required: ${dragOz}`)
+                    console.log(`Upper Throttle: ${upperThrottle} | Lower Throttle: ${lowerThrottle} |Max Thrust: ${maxThrust} | currentNeeded: ${currentNeeded}`)
 
                     // Calculate Rate of climb
                     let velocityFPM = velocity * 5280 / 60; // velocity fpm
@@ -370,7 +378,7 @@ function runAnalysis(event) {
                     if(velocity != 0) {
                         ROCAngle= Math.asin(ROC / velocityFPM) * (180 / Math.PI); // angle in degress for climb
                     } 
-                    console.log(ROCAngle, velocityFPM, ROC)
+                    //console.log(ROCAngle, velocityFPM, ROC)
 
 
                     // Now calculate endurance

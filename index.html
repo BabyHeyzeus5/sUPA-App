@@ -55,27 +55,28 @@
             <label for="dataSelector">What type of data is being uploaded?</label><br>
             <label for="motoCalc">MotoCalc Files</label>
             <input type="radio" name="dataSelector" id="motoCalc" value="motoCalc" checked>
-            <label for="windTunnel">Wind Tunnel Data</label>
-            <input type="radio" name="dataSelector" id="windTunnel" value="windTunnel"><br><br>
+            <!-- <label for="windTunnel">Wind Tunnel Data</label>
+            <input type="radio" name="dataSelector" id="windTunnel" value="windTunnel">-->
+            <br><br> 
 
             <!--Information Section-->
             <label for="motoNum">Number of Motor(s)</label>
             <input type="text" id="motoNum"> <br><br>
             <!--Extra information for wind tunnel-->
-            <div id="windInfo">
+            <!-- <div id="windInfo">
                 <label for="nominalVoltage">Nominal Voltage of Battery:<em>ex(3s battery = 11.1V, 4s battery = 14.8V etc)</em> </label>
                 <input type="text" id="nominalVoltage">V<br><br>
                 <label for="testPressure">Pressure of the wind tunnel during testing:</label><br>
                 <input type="text" id="testPressure">inHg<br><br>
                 <label for="testTemp">Temperature of the wind tunnel during testing:</label><br>
                 <input type="text" id="testTemp">&deg;F<br><br>
-            </div>
+            </div> -->
 
             <label for="folderInput" id="motoCalcNote">Please input Motocalc folder with desired throttle data(s):<br><em>
             Note: The files in the folder need to be named just the throttle %<br>ex ("30.txt" "50.txt" "100.txt")</em><br></label>
-            <label for="folderInput" id="windTunnelNote" style="display: none;">Please input folder with wind tunnel data:<br><em>
+            <!-- <label for="folderInput" id="windTunnelNote" style="display: none;">Please input folder with wind tunnel data:<br><em>
             Note: The files in the folder need to be named just the speed at which the data was taken<br>ex ("20.txt" "35.txt" "50.txt") for 20mph
-            35mph 50mph</em><br></label>
+            35mph 50mph</em><br></label> -->
             <input type="file" id="folderInput" name="folderInput" webkitdirectory directory><br><br>
         </div>
         
@@ -94,19 +95,19 @@
     const windDescription = document.getElementById('windTunnelNote');
     const windInfo = document.getElementById('windInfo')
 
-    function updateDescriptions(value) {
-        if (value === 'motoCalc') {
-            console.log("motoCalc Selected");
-            motoDescription.style.display = 'block';
-            windDescription.style.display = 'none';
-            windInfo.style.display = 'none'
-        } else if (value === 'windTunnel') {
-            console.log("wind tunnel Selected");
-            motoDescription.style.display = 'none';
-            windDescription.style.display = 'block';
-            windInfo.style.display = 'block'
-        }
-    }
+    // function updateDescriptions(value) {
+    //     if (value === 'motoCalc') {
+    //         console.log("motoCalc Selected");
+    //         motoDescription.style.display = 'block';
+    //         windDescription.style.display = 'none';
+    //         windInfo.style.display = 'none'
+    //     } else if (value === 'windTunnel') {
+    //         console.log("wind tunnel Selected");
+    //         motoDescription.style.display = 'none';
+    //         windDescription.style.display = 'block';
+    //         windInfo.style.display = 'block'
+    //     }
+    // }
 
     // Initialize based on pre-selected radio
     const selectedDataType = document.querySelector('input[name="dataSelector"]:checked');
