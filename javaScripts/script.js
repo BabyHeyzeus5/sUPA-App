@@ -1,6 +1,6 @@
 /* Constants */
 const batteryEnergy = 67.2; // Whr
-
+// densitite in slug/ft^3
 const airDensities = [
     0.0023769, // 0 ft
     0.0023423, // 500 ft
@@ -87,17 +87,27 @@ function pullFormData() {
         // get motor data
         const motorToggle = document.getElementById("uploadToggle").checked;
         let motorNum = 0;
+        let dataType;
         if (motorToggle) {
             motorNum = parseInt(document.getElementById("motoNum").value);
+            const selectedDataType = document.querySelector('input[name="dataSelector"]:checked');
+            dataType = selectedDataType.value;
+
         }
 
-        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements];
+        return [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements, dataType];
 
     } catch (error) {
         console.error("Error in pullFormData:", error);
         window.alert("Error in analysis:" + error.message);
         return null;
     }
+}
+
+function convertTunnelData(motorNum) {
+    
+    // convert form data into correct units
+    
 }
 
 
@@ -278,10 +288,10 @@ function runAnalysis(event) {
         console.error("Form data could not be retrieved.");
         return; // Stop execution if form data is invalid
     }
-    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements] = formData;
+    const [S, lSlopeConstants, dSlopeConstants, dryWeight, payloadWeight, motorToggle, motorNum, selectedRequirements, dataType] = formData;
     const totalWeight = dryWeight + payloadWeight
 
-    if (motorToggle) {
+    if (motorToggle && dataType == 'motoCalc') {
         pullMotorData(motorNum).then(({lookupTable, batteryEnergy, batteryCells}) => {
 
             // Create object to save information calculated
@@ -347,11 +357,20 @@ function runAnalysis(event) {
                     if (lowerThrottle === null) lowerThrottle = throttleKeys[0]; // Lowest available throttle
                     if (upperThrottle === null) upperThrottle = throttleKeys[throttleKeys.length - 1]; // Highest available throttle
 
+                    // Other edge case where upper and lower are 100
+
                     // Interpolate Data to get exact throttle setting and efficiency
                     throttleSetting = interpolate(dragOz / motorNum, lookupTable[airspeed][lowerThrottle].thrust, lookupTable[airspeed][upperThrottle].thrust, lowerThrottle, upperThrottle);
                     efficiencySetting = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].efficiency, lookupTable[airspeed][upperThrottle].efficiency);
-                    currentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].current, lookupTable[airspeed][upperThrottle].current);
+                    console.log("Lower Throttle" + lowerThrottle + " Upper Throttle " + upperThrottle);
+                    if (upperThrottle == lowerThrottle) {
+                        currentNeeded = lookupTable[airspeed][lowerThrottle].current;
+                    }else {
+                        currentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].current, lookupTable[airspeed][upperThrottle].current);
+                    }
                     currentNeeded = currentNeeded * motorNum;
+                    console.log(`Speed: ${velocity} | Thrust Required: ${dragOz}`)
+                    console.log(`Upper Throttle: ${upperThrottle} | Lower Throttle: ${lowerThrottle} |Max Thrust: ${maxThrust} | currentNeeded: ${currentNeeded}`)
 
                     // Calculate Rate of climb
                     let velocityFPM = velocity * 5280 / 60; // velocity fpm
@@ -361,7 +380,7 @@ function runAnalysis(event) {
                     if(velocity != 0) {
                         ROCAngle= Math.asin(ROC / velocityFPM) * (180 / Math.PI); // angle in degress for climb
                     } 
-                    console.log(ROCAngle, velocityFPM, ROC)
+                    //console.log(ROCAngle, velocityFPM, ROC)
 
 
                     // Now calculate endurance
@@ -436,21 +455,6 @@ function runAnalysis(event) {
 
                     
                 }
-                // Calculate takeoff parameters for given altitude
-                // const velocityLiftOff = 1.2 * minCalcVelocity;
-                // const incidenceAngle = 3; // degrees
-                // const coefficientLiftTo = lSlopeConstants[0] * (incidenceAngle) + lSlopeConstants[1];
-                // const coefficientDragTo = dSlopeConstants[0] * incidenceAngle**4 + dSlopeConstants[1] * incidenceAngle**3 + dSlopeConstants[2] * incidenceAngle**2 + dSlopeConstants[3] * incidenceAngle + dSlopeConstants[4];
-
-                // const qTo = 0.5 * rho * (0.7 * velocityLiftOff)**2;
-                // const liftTo = qTo * S * coefficientLiftTo;
-                // const dragTO = qTo * S * coefficientDragTo; 
-
-                // const friction = 0.08 // wet grass
-                // let thrustTo;
-
-                // const groundRoll = (1.44 * totalWeight**2) / (32.2 * rho * coefficientLiftTo * (thrustTO - dragTO - friction * (totalWeight - liftTo)));
-
                 // create an object for max values at each altitude
                 altResults[altitude] = {
                     maxROC: maxRateOfClimb.toFixed(0),
@@ -493,6 +497,27 @@ function runAnalysis(event) {
             console.log("Successfully uploaded results");
             window.location.href = "results.html";
         });
+    } else if (motorToggle && dataType == 'windTunnel'){
+        //SECTION FOR WIND TUNNEL INFORMATION
+        console.log("Running Wind Tunnel Analysis...");
+
+        //TODO
+        // Take in data
+        // convert power into amps
+        // Convert thrust into ct
+        // convert to equations
+        // go through all altitudes and airspeeds until thrust required > thrust available
+
+        results[altitude][airspeed] = {
+            dynamicPressure: dynamicPressure.toFixed(2),
+            coefficientLift: coefficientLift.toFixed(2),
+            coefficientDrag: coefficientDrag.toFixed(2),
+            AoA: AoA.toFixed(1),
+            dragOz: dragOz.toFixed(2),
+            lOverD: lOverD.toFixed(2),
+            cLThreeHalfD: cLThreeHalfD.toFixed(2),
+        }
+
     } else {
         const airspeedValues = [...Array(66).keys()]; // Airspeed from 0-65 mph
         // Create object to save information calculated

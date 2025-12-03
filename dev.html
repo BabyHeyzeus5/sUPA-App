@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sUPA App.</title>
+    <title>Dev Page</title>
     <link rel="stylesheet" href="./css/style.css">
     <link rel="icon" type="image/x-icon" href="/assets/satellite-dish.png">
     <!-- <script type="module" src="./javaScripts/script.js" defer></script>  -->
-    <script src="./javaScripts/script.js" defer></script>
+    <script src="./javaScripts/devScript.js" defer></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-R18RCXW4B4"></script>
     <script>
@@ -19,70 +19,48 @@
     </script>
 </head>
 <body>
-    <h1>sUAS Performance Analyzer Application (sUPA App.) V1.0</h1>
+    <h1>Dev Page</h1>
     <p>Created by Andrew Jesus, 2025</p>
     <form id="inputForm">
-        <h3>Requirement Set</h3>
-        <label for="requirementYear">Which Year of AERE 4600's Requirements?</label>
-        <select id="requirementYear"></select><br>
-        <h3>StarCCM Data</h3>   
-        <label for="planformArea">Planform Area (ft<sup>2</sup>):</label>
-        <input type="text" id="planformArea"><br>
-    
-        <label for="lSlope">Coefficient Lift Curve Slope:</label>
-        <input type="text" id="lSlope"> x + <input type="text" id="lIntercept"><br>
-    
-        <label for="dC1">Coefficient Drag Curve Equation:</label><br>
-        <input type="text" id="dC1"> x<sup>4</sup> +
-        <input type="text" id="dC2"> x<sup>3</sup> +
-        <input type="text" id="dC3"> x<sup>2</sup> +
-        <input type="text" id="dC4"> x +
-        <input type="text" id="dC5"><br>
-    
-        <h3>Other Aircraft Information</h3>
-        <label for="weight">Aircraft Dry Weight (lb): </label>
-        <input type="text" id="weight"><br>
-    
-        <label for="pWeight">Payload Weight (0-1.5lbs): </label>
-        <input type="text" id="pWeight"><br>
-    
         <h3>Propulsion Setup</h3>
         
         <label for="uploadToggle">Upload Propulsion Data?</label>
-        <input type="checkbox" id="uploadToggle"><br><br>
+        <input type="checkbox" id="uploadToggle" checked><br><br>
         
-        <div id="fileUploadSection" style="display: none;">
+        <div id="fileUploadSection" style="display: block;">
             <label for="dataSelector">What type of data is being uploaded?</label><br>
             <label for="motoCalc">MotoCalc Files</label>
-            <input type="radio" name="dataSelector" id="motoCalc" value="motoCalc" checked>
-            <!-- <label for="windTunnel">Wind Tunnel Data</label>
-            <input type="radio" name="dataSelector" id="windTunnel" value="windTunnel">-->
-            <br><br> 
+            <input type="radio" name="dataSelector" id="motoCalc" value="motoCalc">
+            <label for="windTunnel">Wind Tunnel Data</label>
+            <input type="radio" name="dataSelector" id="windTunnel" value="windTunnel" checked><br><br>
 
             <!--Information Section-->
             <label for="motoNum">Number of Motor(s)</label>
             <input type="text" id="motoNum"> <br><br>
             <!--Extra information for wind tunnel-->
-            <!-- <div id="windInfo">
+            <div id="windInfo">
                 <label for="nominalVoltage">Nominal Voltage of Battery:<em>ex(3s battery = 11.1V, 4s battery = 14.8V etc)</em> </label>
                 <input type="text" id="nominalVoltage">V<br><br>
                 <label for="testPressure">Pressure of the wind tunnel during testing:</label><br>
                 <input type="text" id="testPressure">inHg<br><br>
                 <label for="testTemp">Temperature of the wind tunnel during testing:</label><br>
                 <input type="text" id="testTemp">&deg;F<br><br>
-            </div> -->
+            </div>
 
             <label for="folderInput" id="motoCalcNote">Please input Motocalc folder with desired throttle data(s):<br><em>
             Note: The files in the folder need to be named just the throttle %<br>ex ("30.txt" "50.txt" "100.txt")</em><br></label>
-            <!-- <label for="folderInput" id="windTunnelNote" style="display: none;">Please input folder with wind tunnel data:<br><em>
+            <label for="folderInput" id="windTunnelNote" style="display: none;">Please input folder with wind tunnel data:<br><em>
             Note: The files in the folder need to be named just the speed at which the data was taken<br>ex ("20.txt" "35.txt" "50.txt") for 20mph
-            35mph 50mph</em><br></label> -->
+            35mph 50mph</em><br></label>
             <input type="file" id="folderInput" name="folderInput" webkitdirectory directory><br><br>
         </div>
         
         <input type="submit" value="Run Analysis">
     </form>
+
     
+    </div>
+    <a class="donate" href="https://venmo.com/u/Andrew-Jesus" target="_blank">Buy me a coffee! &#9749;</a>
 <script>
     // File upload toggle
     document.getElementById('uploadToggle').addEventListener('change', function() {
@@ -95,19 +73,19 @@
     const windDescription = document.getElementById('windTunnelNote');
     const windInfo = document.getElementById('windInfo')
 
-    // function updateDescriptions(value) {
-    //     if (value === 'motoCalc') {
-    //         console.log("motoCalc Selected");
-    //         motoDescription.style.display = 'block';
-    //         windDescription.style.display = 'none';
-    //         windInfo.style.display = 'none'
-    //     } else if (value === 'windTunnel') {
-    //         console.log("wind tunnel Selected");
-    //         motoDescription.style.display = 'none';
-    //         windDescription.style.display = 'block';
-    //         windInfo.style.display = 'block'
-    //     }
-    // }
+    function updateDescriptions(value) {
+        if (value === 'motoCalc') {
+            console.log("motoCalc Selected");
+            motoDescription.style.display = 'block';
+            windDescription.style.display = 'none';
+            windInfo.style.display = 'none'
+        } else if (value === 'windTunnel') {
+            console.log("wind tunnel Selected");
+            motoDescription.style.display = 'none';
+            windDescription.style.display = 'block';
+            windInfo.style.display = 'block'
+        }
+    }
 
     // Initialize based on pre-selected radio
     const selectedDataType = document.querySelector('input[name="dataSelector"]:checked');
@@ -122,10 +100,6 @@
         });
     });
 </script>
-
-    
-    </div>
-    <a class="donate" href="https://venmo.com/u/Andrew-Jesus" target="_blank">Buy me a coffee! &#9749;</a>
     <footer>
      &copy; 2025 Andrew Jesus. Released under the <a href="/LICENSE.md">MIT License</a>.<br>
         <a href="https://www.flaticon.com/free-icons/radar" title="radar icons">Radar icons created by Freepik - Flaticon</a>
