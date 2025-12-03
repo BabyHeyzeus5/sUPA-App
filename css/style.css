@@ -138,3 +138,22 @@ footer {
     border-radius: 15px;
     margin-top: 10px;
 }
+
+.article {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.article p {
+    width: 50%;
+}
+
+.article img {
+    width: 300px;
+    height: auto;
+}
+
+.article .graphics {
+    width:600px;
+}

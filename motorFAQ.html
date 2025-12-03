@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor FAQ</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" type="image/x-icon" href="/assets/satellite-dish.png">
+    <!-- <script type="module" src="./javaScripts/script.js" defer></script>  -->
+    <script src="./javaScripts/script.js" defer></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R18RCXW4B4"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-R18RCXW4B4');
+    </script>
+</head>
+<body>
+    <h1>Which current data should I use?</h1>
+    <p><em>Written by Andrew Jesus, Last Updated Dec. 3rd, 2025.</em></p>
+
+    <div class="article">
+        <br><br>
+        <p>
+            You may have noticed that MotoCalc reports two different current values: battery current and motor current.
+            And choosing between them can leave you feeling a bit like this:<br> <br>
+            <img src="https://www.vhv.rs/dpng/d/564-5648259_are-you-crazy-emoji-decal-hd-png-download.png" alt="crazy"></img><br> <br>
+
+            It is frustrating when one value seems far more favorable than the other. However, it’s important to understand the trade-offs. 
+            While battery current often predicts better endurance, it does not align closely with our wind-tunnel data. In fact, our testing 
+            showed significant discrepancies. These discrepancies were large enough that many teams in my year had to nearly double their battery capacity to meet 
+            endurance goals when relying solely on battery-current predictions.<br> <br>
+
+
+
+            Because of this, I’ve chosen to present both values in this tool. This allows teams to see the optimistic estimate (battery current)
+            alongside the more conservative, but often higher than reality, motor current, which tends to overestimate power draw. Providing both ensures 
+            you can make informed decisions and design with the level of margin you feel is appropriate.<br> <br>
+
+            Finally, remember that all the performance data originates from MotoCalc. This tool is simply
+            meant to organize and present it in a clearer, more digestible format. It’s ultimately up to you,
+            the user, to determine which values best support your design.<br> <br>
+            <img src="/assets/graphs/plot_20mph.png" alt="20mph graph" class="graphics"> <br>
+            <img src="/assets/graphs/plot_25mph.png" alt="25mph graph" class="graphics"> <br>
+            <img src="/assets/graphs/plot_35mph.png" alt="35mph graph" class="graphics"> <br>
+            <img src="/assets/graphs/plot_55mph.png" alt="55mph graph" class="graphics"> <br> 
+
+        </p>
+    </div>
+
+
+    
+    </div>
+    <a class="donate" href="https://venmo.com/u/Andrew-Jesus" target="_blank">Buy me a coffee! &#9749;</a>
+    <footer>
+     &copy; 2025 Andrew Jesus. Released under the <a href="/LICENSE.md">MIT License</a>. <a href="/">Run Analysis</a><br>
+        <a href="https://www.flaticon.com/free-icons/radar" title="radar icons">Radar icons created by Freepik - Flaticon</a> 
+    </footer>
+</body>
+</html>
