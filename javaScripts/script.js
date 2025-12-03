@@ -163,10 +163,10 @@ function pullMotorData(motoNum) {
                             shift = -2;
                         }
 
-                        let [airspeed, thrust, efficiency, propEfficiency, rpm, current] = [
+                        let [airspeed, thrust, efficiency, propEfficiency, rpm, battCurrent, motorCurrent] = [
                             parseFloat(columns[0]), parseFloat(columns[12 + shift]),
                             parseFloat(columns[16 + shift]), parseFloat(columns[15 + shift]),
-                            parseInt(columns[11 + shift]), parseFloat(columns[3 + shift])
+                            parseInt(columns[11 + shift]), parseFloat(columns[3 + shift]), parseFloat(columns[4 + shift])
                         ];
 
                         if (!lookupTable[airspeed]) lookupTable[airspeed] = {};
@@ -184,7 +184,8 @@ function pullMotorData(motoNum) {
                             "rpm": rpm,
                             "Ct": Ct,
                             "diameter": propDiameter,
-                            "current": current
+                            "batteryCurrent": battCurrent,
+                            "motorCurrent": motorCurrent
                         };
                     }
 
@@ -296,10 +297,14 @@ function runAnalysis(event) {
 
             // Create object to save information calculated
             let results = {};
-            let maxEndurance = 0;
-            let maxEnduranceVelocity = 0;
-            let maxEnduranceAltitude = 0;
-            let maxEnduranceAmps = 0;
+            let maxEnduranceBattery = 0;
+            let maxEnduranceBatteryVelocity = 0;
+            let maxEnduranceBatteryAltitude = 0;
+            let maxEnduranceBatteryAmps = 0;
+            let maxEnduranceMotor = 0;
+            let maxEnduranceMotorAmps = 0;
+            let maxEnduranceMotorAltitude = 0;
+            let maxEnduranceMotorVelocity = 0;
             let maxCalcVelocity = 0;
             let maxCalcVelocityAltitude = 0;
             let minCalcVelocity = 100;
@@ -363,13 +368,20 @@ function runAnalysis(event) {
                     efficiencySetting = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].efficiency, lookupTable[airspeed][upperThrottle].efficiency);
                     console.log("Lower Throttle" + lowerThrottle + " Upper Throttle " + upperThrottle);
                     if (upperThrottle == lowerThrottle) {
-                        currentNeeded = lookupTable[airspeed][lowerThrottle].current;
+                        battCurrentNeeded = lookupTable[airspeed][lowerThrottle].batteryCurrent;
+                        motorCurrentNeeded = lookupTable[airspeed][lowerThrottle].motorCurrent;
                     }else {
-                        currentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].current, lookupTable[airspeed][upperThrottle].current);
+                        battCurrentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle,
+                             lookupTable[airspeed][lowerThrottle].batteryCurrent, lookupTable[airspeed][upperThrottle].batteryCurrent);
+                        motorCurrentNeeded = interpolate(throttleSetting, lowerThrottle, upperThrottle,
+                             lookupTable[airspeed][lowerThrottle].motorCurrent, lookupTable[airspeed][upperThrottle].motorCurrent);
                     }
-                    currentNeeded = currentNeeded * motorNum;
-                    console.log(`Speed: ${velocity} | Thrust Required: ${dragOz}`)
-                    console.log(`Upper Throttle: ${upperThrottle} | Lower Throttle: ${lowerThrottle} |Max Thrust: ${maxThrust} | currentNeeded: ${currentNeeded}`)
+                    console.log(motorCurrentNeeded);
+                    battCurrentNeeded = battCurrentNeeded * motorNum;
+                    motorCurrentNeeded = motorCurrentNeeded * motorNum;
+                    console.log(`Speed: ${velocity} | Thrust Required: ${dragOz}`);
+                    console.log(`Upper Throttle: ${upperThrottle} | Lower Throttle: ${lowerThrottle} |Max Thrust: ${maxThrust}
+                         | battCurrentNeeded: ${battCurrentNeeded} | motorCurrentNeeded ${motorCurrentNeeded}`)
 
                     // Calculate Rate of climb
                     let velocityFPM = velocity * 5280 / 60; // velocity fpm
@@ -384,17 +396,28 @@ function runAnalysis(event) {
 
                     // Now calculate endurance
                     //endurance = caclulateEndurance(cLThreeHalfD, batteryEnergy, rho, S, totalWeight, efficiencySetting);
-                    endurance = caclulateEndurance(batteryEnergy, currentNeeded);
-                    if (isNaN(endurance) || endurance < 0) {
-                        endurance = 0;
+                    batteryEndurance = caclulateEndurance(batteryEnergy, battCurrentNeeded);
+                    motorEndurance = caclulateEndurance(batteryEnergy, motorCurrentNeeded);
+                    if (isNaN(batteryEndurance) || batteryEndurance < 0) {
+                        batteryEndurance = 0;
+                    }
+                    if (isNaN(motorEndurance) || motorEndurance < 0) {
+                        motorEndurance = 0;
                     }
 
-                    if (endurance > maxEndurance && AoA < 7){ // lower than estimated stall angle for factor of saftey
-                        maxEndurance = endurance;
-                        maxEnduranceVelocity = airspeed;
-                        maxEnduranceAltitude = altitude;
-                        maxEnduranceAmps = currentNeeded;
+                    if (batteryEndurance > maxEnduranceBattery && AoA < 7){ // lower than estimated stall angle for factor of saftey
+                        maxEnduranceBattery = batteryEndurance;
+                        maxEnduranceBatteryVelocity = airspeed;
+                        maxEnduranceBatteryAltitude = altitude;
+                        maxEnduranceBatteryAmps = battCurrentNeeded;
                     } 
+
+                    if (motorEndurance > maxEnduranceMotor && AoA < 7) {
+                        maxEnduranceMotor = motorEndurance;
+                        maxEnduranceMotorAmps = motorCurrentNeeded;
+                        maxEnduranceMotorVelocity = airspeed;
+                        maxEnduranceMotorAltitude = altitude;
+                    }
 
                     // checking for stall speed 
 
@@ -446,9 +469,11 @@ function runAnalysis(event) {
                         dragOz: dragOz.toFixed(2),
                         lOverD: lOverD.toFixed(2),
                         cLThreeHalfD: cLThreeHalfD.toFixed(2),
-                        endurance: endurance.toFixed(0),
+                        batteryEndurance: batteryEndurance.toFixed(0),
                         thrust: maxThrust.toFixed(2),
-                        current: currentNeeded.toFixed(2),
+                        batteryCurrent: battCurrentNeeded.toFixed(2),
+                        motorCurrent: motorCurrentNeeded.toFixed(2),
+                        motorEndurance: motorEndurance.toFixed(0),
                         ROC: ROC.toFixed(0)
                     }
 
@@ -468,10 +493,14 @@ function runAnalysis(event) {
             // create maxval object to push to localstorage
             maxVals = {
                 endurance: {
-                    maxEndurance: maxEndurance,
-                    maxEnduranceVelocity: maxEnduranceVelocity,
-                    maxEnduranceAltitude: maxEnduranceAltitude,
-                    maxEnduranceAmps: maxEnduranceAmps
+                        maxEnduranceMotor: maxEnduranceMotor,
+                        maxEnduranceMotorAmps: maxEnduranceMotorAmps,
+                        maxEnduranceMotorVelocity: maxEnduranceMotorVelocity,
+                        maxEnduranceMotorAltitude:  maxEnduranceMotorAltitude,
+                        maxEnduranceBattery: maxEnduranceBattery,
+                        maxEnduranceBatteryVelocity: maxEnduranceBatteryVelocity,
+                        maxEnduranceBatteryAltitude: maxEnduranceBatteryAltitude,
+                        maxEnduranceBatteryAmps: maxEnduranceBatteryAmps
                 },
                 maxSpeed: {
                     maxCalcVelocity: maxCalcVelocity,
