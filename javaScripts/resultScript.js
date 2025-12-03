@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const resultsTable = document.getElementById("resultsTable");
     const altitudeSelect = document.getElementById("altitudeSelect");
     const req1 = document.getElementById("requirement1");
+    const req1_5 = document.getElementById("requirement1.5");
     const req2 = document.getElementById("requirement2");
     const req3 = document.getElementById("requirement3");
     const req4 = document.getElementById("requirement4");
@@ -100,9 +101,12 @@ document.addEventListener("DOMContentLoaded", function () {
     
     function loadResults() {
         // Load the rest
-        let maxEndurance;
-        let maxEnduranceVelocity;
-        let maxEnduranceAltitude;
+        let maxEnduranceBattery;
+        let maxEnduranceMotor;
+        let maxEnduranceBatteryVelocity;
+        let maxEnduranceBatteryAltitude;
+        let maxEnduranceMotorVelocity;
+        let maxEnduranceMotorAltitude;
         let maxCalcVelocity;
         let maxCalcVelocityAltitude;
         let minCalcVelocity;
@@ -115,10 +119,15 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("in first")
             results = JSON.parse(localStorage.getItem("analysisResults"));
             maxResults = JSON.parse(localStorage.getItem("maxResults"));
-            maxEndurance = maxResults.endurance.maxEndurance;
-            maxEnduranceVelocity = maxResults.endurance.maxEnduranceVelocity;
-            maxEnduranceAltitude = maxResults.endurance.maxEnduranceAltitude;
-            maxEnduranceAmps = maxResults.endurance.maxEnduranceAmps;
+            console.log(maxResults)
+            maxEnduranceBattery = maxResults.endurance.maxEnduranceBattery;
+            maxEnduranceMotor = maxResults.endurance.maxEnduranceMotor;
+            maxEnduranceBatteryVelocity = maxResults.endurance.maxEnduranceBatteryVelocity;
+            maxEnduranceBatteryAltitude = maxResults.endurance.maxEnduranceBatteryAltitude;
+            maxEnduranceMotorVelocity = maxResults.endurance.maxEnduranceMotorVelocity;
+            maxEnduranceMotorAltitude = maxResults.endurance.maxEnduranceMotorAltitude;
+            maxEnduranceAmpsBattery = maxResults.endurance.maxEnduranceBatteryAmps;
+            maxEnduranceAmpsMotor = maxResults.endurance.maxEnduranceMotorAmps;
             maxCalcVelocity = maxResults.maxSpeed.maxCalcVelocity;
             maxCalcVelocityAltitude = maxResults.maxSpeed.maxCalcVelocityAltitude;
             minCalcVelocity = maxResults.minSpeed.minCalcVelocity;
@@ -143,16 +152,27 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(requirements);
             // update requirements as needed
             if (motorToggle == "true") {
-                // requirement 1
-                if (requirements[0][1] < maxEndurance ) {
+                // requirement 1 for battery
+                if (requirements[0][1] < maxEnduranceBattery ) {
                     req1.classList.add("objective");
                     req1.innerHTML += "Objective";
-                } else if (requirements[0][0] < maxEndurance ) {
+                } else if (requirements[0][0] < maxEnduranceBattery ) {
                     req1.classList.add("threshold");
                     req1.innerHTML += "Threshold";
                 } else {
                     req1.classList.add("notMet");
                     req1.innerHTML += "Not Met";
+                }
+                // requirement 1 for motor
+                if (requirements[0][1] < maxEnduranceMotor ) {
+                    req1_5.classList.add("objective");
+                    req1_5.innerHTML += "Objective";
+                } else if (requirements[0][0] < maxEnduranceMotor ) {
+                    req1_5.classList.add("threshold");
+                    req1_5.innerHTML += "Threshold";
+                } else {
+                    req1_5.classList.add("notMet");
+                    req1_5.innerHTML += "Not Met";
                 }
                 //requirement 2
                 if (requirements[1][1] <= maxAltitude ) {
@@ -182,13 +202,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 function calcBatt(time, current) {
                     return (time / 60) * current * 1000;
                 }
-                batteryThreshold = calcBatt(30, maxEnduranceAmps);
-                batteryObjective = calcBatt(45, maxEnduranceAmps);
-
-
+                batteryThreshold = calcBatt(30, maxEnduranceAmpsBattery);
+                batteryObjective = calcBatt(45, maxEnduranceAmpsBattery);
+                batteryThresholdMotor = calcBatt(30, maxEnduranceAmpsMotor);
+                batteryObjectiveMotor = calcBatt(45, maxEnduranceAmpsMotor);
+                console.log(maxResults)
                 document.getElementById("resultLog").innerHTML = `
-                Max endurance is ${maxEndurance.toFixed(0)} minutes traveling at ${maxEnduranceVelocity} mph at ${maxEnduranceAltitude.toFixed(0)} ft (msl) pulling ${maxEnduranceAmps.toFixed(2)} amps.<br>
-                Battery capacity required for: Threshold: ${batteryThreshold.toFixed(0)}mAh, Objective: ${batteryObjective.toFixed(0)}mAh.<br>
+                Max endurance is ${maxEnduranceBattery.toFixed(0)} minutes with Battery Amps pulling ${maxEnduranceAmpsBattery.toFixed(2)} amps traveling at ${maxEnduranceBatteryVelocity} mph at ${maxEnduranceBatteryAltitude.toFixed(0)} ft (msl) .<br>
+                Battery capacity required for (using Battery Amps): Threshold: ${batteryThreshold.toFixed(0)}mAh, Objective: ${batteryObjective.toFixed(0)}mAh.<br>
+                Max endurance is ${maxEnduranceMotor.toFixed(0)} minutes with Motor Amps pulling ${maxEnduranceAmpsMotor.toFixed(2)} amps traveling at ${maxEnduranceMotorVelocity} mph at ${maxEnduranceMotorAltitude.toFixed(0)} ft (msl) .<br>
+                Battery capacity required for (using Motor Amps): Threshold: ${batteryThresholdMotor.toFixed(0)}mAh, Objective: ${batteryObjectiveMotor.toFixed(0)}mAh.<br>
                 Max speed is ${maxCalcVelocity} mph at ${maxCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
                 Min stall speed is ${minCalcVelocity} mph at ${minCalcVelocityAltitude.toFixed(0)} ft (msl).<br>
                 Maximum calculated altitude is ${maxAltitude} ft (msl).`;
@@ -265,7 +288,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.AoA > 16 || isNaN(data.throttle) && motorToggle == true) continue;
 
                 let row = document.createElement("tr");
-
                 row.innerHTML = `
                     <td>${velocity}</td>
                     <td>${data.dynamicPressure}</td>
@@ -275,8 +297,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${data.dragOz}</td>
                     <td>${data.thrust}</td>
                     <td>${data.lOverD}</td>
-                    <td>${data.endurance}</td>
-                    <td>${data.current}</td>
+                    <td>${data.batteryEndurance}</td>
+                    <td>${data.motorEndurance}</td>
+                    <td>${data.batteryCurrent}</td>
+                    <td>${data.motorCurrent}</td>
                     <td>${data.throttle}</td>
                 `;
 
@@ -301,7 +325,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const cLThreeHalfD = [];
         const thrustAvailable = [];
         const thrustRequired = [];
-        const current = [];
+        const batteryCurrent = [];
+        const motorCurrent = []
         if (motorToggle == "true") {
             // pull data for propulsion information
             const propInfo = JSON.parse(localStorage.getItem("propulsionInfo")) || {};
@@ -317,7 +342,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 cLThreeHalfD.push(results[selectedAltitude][velocity].cLThreeHalfD);
                 thrustAvailable.push(results[selectedAltitude][velocity].thrust);
                 thrustRequired.push(results[selectedAltitude][velocity].dragOz);
-                current.push(results[selectedAltitude][velocity].current)
+                batteryCurrent.push(results[selectedAltitude][velocity].batteryCurrent);
+                motorCurrent.push(results[selectedAltitude][velocity].motorCurrent)
             }
     
             const ctx1 = document.getElementById("ldChart").getContext("2d");
@@ -399,15 +425,25 @@ document.addEventListener("DOMContentLoaded", function () {
                         pointBackgroundColor: "red"
                     },
                     {
-                        label: "Current Draw at Thrust Required",
-                        data: current, // Assuming you have an array for current values
+                        label: "Battery Current Draw at Thrust Required",
+                        data: batteryCurrent, // Assuming you have an array for current values
                         borderColor: "green",
                         borderWidth: 2,
                         fill: false,
                         pointRadius: 5,
                         pointBackgroundColor: "green",
                         yAxisID: "y1" // Assign to the secondary y-axis
-                    }]
+                    },
+                    {
+                        label: "Motor Current Draw at Thrust Required",
+                        data: motorCurrent, // Assuming you have an array for current values
+                        borderColor: "orange",
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 5,
+                        pointBackgroundColor: "orange",
+                        yAxisID: "y1" // Assign to the secondary y-axis
+                    } ]
                 },
                 options: {
                     responsive: true,
