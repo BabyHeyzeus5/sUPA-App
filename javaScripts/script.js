@@ -361,6 +361,7 @@ function runAnalysis(event) {
                     // Interpolate Data to get exact throttle setting and efficiency
                     throttleSetting = interpolate(dragOz / motorNum, lookupTable[airspeed][lowerThrottle].thrust, lookupTable[airspeed][upperThrottle].thrust, lowerThrottle, upperThrottle);
                     efficiencySetting = interpolate(throttleSetting, lowerThrottle, upperThrottle, lookupTable[airspeed][lowerThrottle].efficiency, lookupTable[airspeed][upperThrottle].efficiency);
+                    console.log("Lower Throttle" + lowerThrottle + " Upper Throttle " + upperThrottle);
                     if (upperThrottle == lowerThrottle) {
                         currentNeeded = lookupTable[airspeed][lowerThrottle].current;
                     }else {
