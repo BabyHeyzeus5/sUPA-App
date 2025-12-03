@@ -345,6 +345,7 @@ function runAnalysis(event) {
                 
                     for (let i = 0; i < throttleKeys.length; i++) {
                         let throttle = throttleKeys[i];
+                        console.log("Table", lookupTable[airspeed][throttle]);
                         let thrust = lookupTable[airspeed][throttle].Ct * rho * lookupTable[airspeed][throttle].rpm**2 * lookupTable[airspeed][throttle].diameter**4; // equation to relate by air density
                         thrust = thrust * motorNum;
                         if (thrust < dragOz) {
@@ -355,7 +356,7 @@ function runAnalysis(event) {
                         }
                     }
 
-                    let maxThrust = lookupTable[airspeed]["100"].Ct * rho * lookupTable[airspeed]["100"].rpm**2 * lookupTable[airspeed]["100"].diameter**4; // equation to relate by air density
+                    let maxThrust = lookupTable[airspeed][100].Ct * rho * lookupTable[airspeed][100].rpm**2 * lookupTable[airspeed][100].diameter**4; // equation to relate by air density
                     maxThrust = maxThrust * motorNum
                     // Handle edge cases where no bounds were found
                     if (lowerThrottle === null) lowerThrottle = throttleKeys[0]; // Lowest available throttle
